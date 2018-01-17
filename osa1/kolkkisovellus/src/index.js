@@ -11,6 +11,7 @@ class App extends React.Component {
         }
 
     }
+
     luoSatunnainen = () => {
         return Math.floor(Math.random() * (anecdotes.length));
     }
@@ -29,8 +30,8 @@ class App extends React.Component {
         }
     }
 
-
     render() {
+        const suurin = this.state.votes.indexOf(Math.max(...this.state.votes))
 
         return (
             <div>
@@ -38,6 +39,9 @@ class App extends React.Component {
                 <p>Äänestystulos: {this.state.votes[this.state.selected]}</p>
                 <button onClick={this.aanesta(this.state.selected)}>Äänestä</button>
                 <button onClick={this.seuraavaAnekdootti()}>Seuraava</button>
+                <h1>Eniten ääniä kerännyt anekdootti:</h1>
+                <p>{this.props.anecdotes[suurin]}</p>
+                <p>Ääniä: {this.state.votes[suurin]}</p>
             </div>
         )
     }
