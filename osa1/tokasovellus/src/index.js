@@ -37,6 +37,7 @@ const Buttons = (props) => {
     )
 }
 
+
 class App extends React.Component {
     constructor() {
         super()
@@ -44,32 +45,16 @@ class App extends React.Component {
             hyva: 0,
             neutraali: 0,
             huono: 0,
-            kaikki: []
+        }
+
+    }
+
+    lisaaArvo = (laji, arvo) => {
+
+        return () => {
+            this.setState({ [laji]: arvo })
         }
     }
-
-    kasvataHyva = () => {
-        this.setState({
-            hyva: this.state.hyva + 1,
-            kaikki: this.state.kaikki.concat(1)
-        })
-    }
-
-    kasvataNeutraali = () => {
-        this.setState({
-            neutraali: this.state.neutraali + 1,
-            kaikki: this.state.kaikki.concat(0)
-        })
-    }
-
-    kasvataHuono = () => {
-        this.setState({
-            huono: this.state.huono + 1,
-            kaikki: this.state.kaikki.concat(-1)
-        })
-    }
-
-
 
     render() {
         const arvot = {
@@ -86,10 +71,11 @@ class App extends React.Component {
             keskiarvo: (arvot.hyva + arvot.neutraali + arvot.huono) / arvot.summa,
             positiiviset: arvot.hyva / (arvot.summa / 100) + " %"
         }
+
         const kuuntelijat = {
-            pos: this.kasvataHyva,
-            neut: this.kasvataNeutraali,
-            neg: this.kasvataHuono
+            pos: this.lisaaArvo("hyva", this.state.hyva + 1),
+            neut: this.lisaaArvo("neutraali", this.state.neutraali + 1),
+            neg: this.lisaaArvo("huono", this.state.huono + 1)
         }
         if (arvot.summa === 0) {
             return (
