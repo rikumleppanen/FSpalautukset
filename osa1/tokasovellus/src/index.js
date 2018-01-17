@@ -24,6 +24,18 @@ const Statistics = (props) => {
         </div>
     )
 }
+const Buttons = (props) => {
+    return (
+        <div>
+            <h1>Anna palautetta palvelustamme</h1>
+            <Button handleClick={props.kuuntelijat.pos} teksti="Hyvää työtä!" />
+            <Button handleClick={props.kuuntelijat.neut} teksti="Neutraalia jälkeä" />
+            <Button handleClick={props.kuuntelijat.neg} teksti="Parantamisen varaa on" />
+            <h1>Dashboard</h1>
+        </div>
+
+    )
+}
 
 class App extends React.Component {
     constructor() {
@@ -31,28 +43,40 @@ class App extends React.Component {
         this.state = {
             hyva: 0,
             neutraali: 0,
-            huono: 0
+            huono: 0,
+            kaikki: []
         }
     }
 
     kasvataHyva = () => {
-        this.setState({ hyva: this.state.hyva + 1 })
+        this.setState({
+            hyva: this.state.hyva + 1,
+            kaikki: this.state.kaikki.concat(1)
+        })
     }
 
     kasvataNeutraali = () => {
-        this.setState({ neutraali: this.state.neutraali + 1 })
+        this.setState({
+            neutraali: this.state.neutraali + 1,
+            kaikki: this.state.kaikki.concat(0)
+        })
     }
 
     kasvataHuono = () => {
-        this.setState({ huono: this.state.huono + 1 })
+        this.setState({
+            huono: this.state.huono + 1,
+            kaikki: this.state.kaikki.concat(-1)
+        })
     }
+
+
 
     render() {
         const arvot = {
             hyva: this.state.hyva * 1,
             neutraali: this.state.neutraali * 0,
             huono: this.state.huono * (-1),
-            summa: this.state.hyva + this.state.neutraali + this.state.huono,
+            summa: this.state.hyva + this.state.neutraali + this.state.huono
 
         }
         const tilasto = {
@@ -62,17 +86,27 @@ class App extends React.Component {
             keskiarvo: (arvot.hyva + arvot.neutraali + arvot.huono) / arvot.summa,
             positiiviset: arvot.hyva / (arvot.summa / 100) + " %"
         }
+        const kuuntelijat = {
+            pos: this.kasvataHyva,
+            neut: this.kasvataNeutraali,
+            neg: this.kasvataHuono
+        }
+        if (arvot.summa === 0) {
+            return (
+                <div>
+                    <Buttons kuuntelijat={kuuntelijat} />
+                    <p>Anna palautetta ensiksi</p>
+                </div>
+            )
+        } else {
+            return (
+                <div>
+                    <Buttons kuuntelijat={kuuntelijat} />
+                    <Statistics arvot={arvot} tilasto={tilasto} />
+                </div>
+            )
+        }
 
-        return (
-            <div>
-                <h1>Anna palautetta palvelustamme</h1>
-                <Button handleClick={this.kasvataHyva} teksti="Hyvää työtä!" />
-                <Button handleClick={this.kasvataNeutraali} teksti="Neutraalia jälkeä" />
-                <Button handleClick={this.kasvataHuono} teksti="Parantamisen varaa on" />
-                <h1>Dashboard</h1>
-                <Statistics arvot={arvot} tilasto={tilasto} />
-            </div>
-        )
     }
 
 }
