@@ -10,18 +10,20 @@ const Button = (props) => {
 }
 const Statistic = (props) => {
     return (
-        <div>{props.teksti} {props.arvo}</div>
+        <td>{props.teksti} {props.arvo}</td>
     )
 }
 const Statistics = (props) => {
     return (
-        <div>
-            <Statistic teksti={"Positiivinen:"} arvo={props.tilasto.pos} />
-            <Statistic teksti={"Neutraali:"} arvo={props.tilasto.neut} />
-            <Statistic teksti={"Negatiivinen:"} arvo={props.tilasto.neg} />
-            <Statistic teksti={"Keskiarvo:"} arvo={props.tilasto.keskiarvo} />
-            <Statistic teksti={"Positiivisten osuus:"} arvo={props.tilasto.positiiviset} />
-        </div>
+        <table>
+            <tbody>
+                <tr><Statistic teksti={"Positiivinen:"} arvo={props.tilasto.pos} /></tr>
+                <tr><Statistic teksti={"Neutraali:"} arvo={props.tilasto.neut} /></tr>
+                <tr><Statistic teksti={"Negatiivinen:"} arvo={props.tilasto.neg} /></tr>
+                <tr><Statistic teksti={"Keskiarvo:"} arvo={props.tilasto.keskiarvo} /></tr>
+                <tr><Statistic teksti={"Positiivisten osuus:"} arvo={props.tilasto.positiiviset} /></tr>
+            </tbody>
+        </table>
     )
 }
 const Buttons = (props) => {
