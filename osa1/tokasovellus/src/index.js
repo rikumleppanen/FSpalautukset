@@ -1,6 +1,30 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+const Button = (props) => {
+    return (
+        <button onClick={props.handleClick}>
+            {props.teksti}
+        </button>
+    )
+}
+const Statistic = (props) => {
+    return (
+        <div>{props.teksti} {props.arvo}</div>
+    )
+}
+const Statistics = (props) => {
+    return (
+        <div>
+            <Statistic teksti={"Positiivinen:"} arvo={props.tilasto.pos} />
+            <Statistic teksti={"Neutraali:"} arvo={props.tilasto.neut} />
+            <Statistic teksti={"Negatiivinen:"} arvo={props.tilasto.neg} />
+            <Statistic teksti={"Keskiarvo:"} arvo={props.tilasto.keskiarvo} />
+            <Statistic teksti={"Positiivisten osuus:"} arvo={props.tilasto.positiiviset} />
+        </div>
+    )
+}
+
 class App extends React.Component {
     constructor() {
         super()
@@ -24,27 +48,33 @@ class App extends React.Component {
     }
 
     render() {
-        const hyva = this.state.hyva * 1
-        const neutraali = this.state.neutraali * 0
-        const huono = this.state.huono * (-1)
-        const summa = this.state.hyva + this.state.neutraali + this.state.huono
-        const keskiarvo = (hyva + neutraali + huono) / summa
-        const positiiviset = hyva / (summa / 100)
+        const arvot = {
+            hyva: this.state.hyva * 1,
+            neutraali: this.state.neutraali * 0,
+            huono: this.state.huono * (-1),
+            summa: this.state.hyva + this.state.neutraali + this.state.huono,
+
+        }
+        const tilasto = {
+            pos: this.state.hyva,
+            neut: this.state.neutraali,
+            neg: this.state.huono,
+            keskiarvo: (arvot.hyva + arvot.neutraali + arvot.huono) / arvot.summa,
+            positiiviset: arvot.hyva / (arvot.summa / 100) + " %"
+        }
+
         return (
             <div>
                 <h1>Anna palautetta palvelustamme</h1>
-                <button onClick={this.kasvataHyva}>Hyvää työtä!</button>
-                <button onClick={this.kasvataNeutraali}>Neutraalia jälkeä</button>
-                <button onClick={this.kasvataHuono}>Parantamisen varaa on</button>
+                <Button handleClick={this.kasvataHyva} teksti="Hyvää työtä!" />
+                <Button handleClick={this.kasvataNeutraali} teksti="Neutraalia jälkeä" />
+                <Button handleClick={this.kasvataHuono} teksti="Parantamisen varaa on" />
                 <h1>Dashboard</h1>
-                <div>Positiivinen: {this.state.hyva}</div>
-                <div>Neutraali: {this.state.neutraali}</div>
-                <div>Negatiivinen: {this.state.huono}</div>
-                <div>Keskiarvo: {keskiarvo}</div>
-                <div>Positiivisten osuus: {positiiviset} %</div>
+                <Statistics arvot={arvot} tilasto={tilasto} />
             </div>
         )
     }
+
 }
 
 ReactDOM.render(
