@@ -1,11 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
+
 class App extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            selected: 0
+            selected: 0,
+            votes: this.props.anecdotes.map(p => 0)
         }
 
     }
@@ -19,10 +21,22 @@ class App extends React.Component {
         }
     }
 
+    aanesta = (nro) => {
+        return () => {
+            let saalis = this.state.votes.slice()
+            saalis[nro] = saalis[nro] + 1
+            this.setState({ votes: saalis })
+        }
+    }
+
+
     render() {
+
         return (
             <div>
                 <p>{this.props.anecdotes[this.state.selected]}</p>
+                <p>Äänestystulos: {this.state.votes[this.state.selected]}</p>
+                <button onClick={this.aanesta(this.state.selected)}>Äänestä</button>
                 <button onClick={this.seuraavaAnekdootti()}>Seuraava</button>
             </div>
         )
