@@ -15,10 +15,10 @@ class App extends React.Component {
   }
   componentWillMount() {
     axios.get('http://localhost:3001/persons')
-    .then(response => {
-      console.log('promise fulfilled')
-      this.setState({persons: response.data})
-    })
+      .then(response => {
+        console.log('promise fulfilled')
+        this.setState({ persons: response.data })
+      })
   }
 
   addItem = (event) => {
@@ -30,13 +30,14 @@ class App extends React.Component {
         name: this.state.newName,
         number: this.state.newNumber
       }
-      const persons = this.state.persons.concat(itemObject)
-
-      this.setState({
-        persons: persons,
-        newName: '',
-        newNumber: ''
-      })
+      axios.post('http://localhost:3001/persons', itemObject)
+        .then(response => {
+          this.setState({
+            persons: this.state.persons.concat(response.data),
+            newName: '',
+            newNumber: ''
+          })
+        })
     } else {
       alert("Nimi on jo olemassa")
     }
