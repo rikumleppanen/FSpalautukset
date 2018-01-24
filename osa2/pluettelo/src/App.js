@@ -1,7 +1,9 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import Item from './components/Item'
-import axios from 'axios'
+import React from 'react'
+import ItemTable from './components/ItemTable'
+import Notification from './components/Notification'
+import personsService from './services/Persons'
+
+
 
 class App extends React.Component {
   constructor(props) {
@@ -10,38 +12,88 @@ class App extends React.Component {
       persons: [],
       newName: '',
       newNumber: '',
-      search: ''
+      search: '',
+      notification: null
     }
   }
   componentWillMount() {
-    axios.get('http://localhost:3001/persons')
-      .then(response => {
-        console.log('promise fulfilled')
-        this.setState({ persons: response.data })
-      })
+    personsService.getAll().then(persons => {
+      this.setState({ persons })
+    })
   }
 
   addItem = (event) => {
     event.preventDefault()
-    const result = this.state.persons.map(p => p.name).indexOf(this.state.newName)
+    const person = this.state.persons.find(p => p.name === this.state.newName);
 
-    if (result === -1) {
+    if (!person) {
       const itemObject = {
         name: this.state.newName,
         number: this.state.newNumber
       }
-      axios.post('http://localhost:3001/persons', itemObject)
-        .then(response => {
-          this.setState({
-            persons: this.state.persons.concat(response.data),
-            newName: '',
-            newNumber: ''
-          })
+      personsService.create(itemObject).then(newObj => {
+        this.setState({
+          persons: this.state.persons.concat(newObj),
+          newName: '',
+          newNumber: '',
+          search: '',
+          notification: `Henkilö ${newObj.name} on lisätty`
         })
+        setTimeout(() => {
+          this.setState({ notification: null })
+        }, 5000)
+      })
     } else {
-      alert("Nimi on jo olemassa")
+      if (this.state.newNumber !== person.number && this.state.newNumber.length > 0) {
+        this.updateItem(person)
+      } else {
+        alert("Henkilön nimi on jo luettelossa")
+      }
+
     }
   }
+
+
+  removeItem = (id, one) => {
+    return () => {
+      if (window.confirm(`Poistetaanko ${one.name} luettelosta?`)) {
+        const namelabel = one.name
+        personsService.remove(one.id).then(one => {
+          this.setState({
+            persons: this.state.persons.filter(p => p.id !== id),
+            notification: `Henkilö ${namelabel} on poistettu`
+          })
+          setTimeout(() => {
+            this.setState({ notification: null })
+          }, 5000)
+        })
+      }
+    }
+
+  }
+
+  updateItem = (one) => {
+    if (window.confirm(`${one.name} on jo luettelossa, korvaako uusi numero ${this.state.newNumber} vanhan numeron ${one.number}?`)) {
+      const itemObject = {
+        name: one.name,
+        number: this.state.newNumber
+      }
+      personsService.update(one.id, itemObject).then(newObj => {
+        this.setState({
+          newName: '',
+          newNumber: '',
+          notification: `Henkilön ${newObj.name} numero on päivitetty`
+        })
+        setTimeout(() => {
+          this.setState({ notification: null })
+        }, 5000)
+      }).catch(error => {
+        alert(`Henkilö '${one.name}' on jo poistettu`)
+        this.setState({ persons: this.state.persons.filter(n => n.id !== one.id) })
+      })
+    }
+  }
+
 
   handleNameChange = (event) => {
     this.setState({ newName: event.target.value })
@@ -54,16 +106,23 @@ class App extends React.Component {
     this.setState({ search: event.target.value })
   }
 
+  itemRow = () =>
+    this.state.persons.filter(p => p.name.toLowerCase().includes(this.state.search.toLowerCase())).map(p =>
+      <tr key={p.id}>
+        <td>{p.name} </td>
+        <td>{p.number}</td>
+        <td><button onClick={this.removeItem(p.id, p)}>Poista</button>
+        </td>
+      </tr>
+    )
+
 
   render() {
-    let filteredNames = this.state.persons.filter(
-      (item) => {
-        return item.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1
-      }
-    )
+
     return (
       <div>
         <h2>Puhelinluettelo</h2>
+        <Notification message={this.state.notification} />
         <div>
           rajaa näytettäviä: <input value={this.state.search} onChange={this.searchItem} />
         </div>
@@ -83,15 +142,11 @@ class App extends React.Component {
           </div>
         </form>
         <h2>Numerot</h2>
-        <table>
-          <tbody>
-            {filteredNames.map(p => <Item key={p.name} name={p.name} number={p.number} />)}
-          </tbody>
-        </table>
-
+        <ItemTable content={this.itemRow()} />
       </div>
     )
   }
 }
+
 
 export default App
